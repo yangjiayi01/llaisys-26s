@@ -27,7 +27,7 @@ target("llaisys-utils")
         add_cxflags("/openmp")
     else
         add_cxflags("-fopenmp")
-        add_ldflags("-fopenmp")
+        add_links("gomp")
     end
     if not is_plat("windows") then
         add_cxflags("-fPIC", "-Wno-unknown-pragmas")
@@ -53,7 +53,7 @@ target("llaisys-device")
         add_cxflags("/openmp")
     else
         add_cxflags("-fopenmp")
-        add_ldflags("-fopenmp")
+        add_links("gomp")
     end
     if not is_plat("windows") then
         add_cxflags("-fPIC", "-Wno-unknown-pragmas")
@@ -75,7 +75,7 @@ target("llaisys-core")
         add_cxflags("/openmp")
     else
         add_cxflags("-fopenmp")
-        add_ldflags("-fopenmp")
+        add_links("gomp")
     end
     if not is_plat("windows") then
         add_cxflags("-fPIC", "-Wno-unknown-pragmas")
@@ -96,7 +96,7 @@ target("llaisys-tensor")
         add_cxflags("/openmp")
     else
         add_cxflags("-fopenmp")
-        add_ldflags("-fopenmp")
+        add_links("gomp")
     end
     if not is_plat("windows") then
         add_cxflags("-fPIC", "-Wno-unknown-pragmas")
@@ -120,7 +120,7 @@ target("llaisys-ops")
         add_cxflags("/openmp")
     else
         add_cxflags("-fopenmp")
-        add_ldflags("-fopenmp")
+        add_links("gomp")
     end
     if not is_plat("windows") then
         add_cxflags("-fPIC", "-Wno-unknown-pragmas")
@@ -145,7 +145,7 @@ target("llaisys")
         add_cxflags("/openmp")
     else
         add_cxflags("-fopenmp")
-        add_ldflags("-fopenmp")
+        add_links("gomp")
     end
     add_files("src/llaisys/*.cc")
     add_files("src/models/*/*.cpp")
