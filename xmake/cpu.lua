@@ -6,7 +6,7 @@ target("llaisys-device-cpu")
         add_cxflags("/openmp")
     else
         add_cxflags("-fopenmp")
-        add_ldflags("-fopenmp")
+        add_links("gomp")
     end
     if not is_plat("windows") then
         add_cxflags("-fPIC", "-Wno-unknown-pragmas")
@@ -26,7 +26,7 @@ target("llaisys-ops-cpu")
         add_cxflags("/openmp")
     else
         add_cxflags("-fopenmp")
-        add_ldflags("-fopenmp")
+        add_links("gomp")
     end
     if not is_plat("windows") then
         add_cxflags("-fPIC", "-Wno-unknown-pragmas")
