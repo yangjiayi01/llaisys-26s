@@ -21,7 +21,17 @@ def load_hf_model(model_path=None, device_name="cpu"):
         print(f"Loading model from local path: {model_path}")
     else:
         print(f"Loading model from Hugging Face: {model_id}")
-        model_path = snapshot_download(model_id)
+        # retry on transient HF errors (429 rate-limit etc.)
+        import time as _time
+        for _attempt in range(5):
+            try:
+                model_path = snapshot_download(model_id)
+                break
+            except Exception as e:
+                print(f"HF download attempt {_attempt + 1} failed: {e}")
+                if _attempt == 4:
+                    raise
+                _time.sleep(10 * (_attempt + 1))
     tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
     model = AutoModelForCausalLM.from_pretrained(
         model_path,
