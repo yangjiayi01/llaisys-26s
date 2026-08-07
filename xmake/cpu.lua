@@ -2,6 +2,12 @@ target("llaisys-device-cpu")
     set_kind("static")
     set_languages("cxx17")
     set_warnings("all", "error")
+    if is_plat("windows") then
+        add_cxflags("/openmp")
+    else
+        add_cxflags("-fopenmp")
+        add_ldflags("-fopenmp")
+    end
     if not is_plat("windows") then
         add_cxflags("-fPIC", "-Wno-unknown-pragmas")
     end
@@ -16,6 +22,12 @@ target("llaisys-ops-cpu")
     add_deps("llaisys-tensor")
     set_languages("cxx17")
     set_warnings("all", "error")
+    if is_plat("windows") then
+        add_cxflags("/openmp")
+    else
+        add_cxflags("-fopenmp")
+        add_ldflags("-fopenmp")
+    end
     if not is_plat("windows") then
         add_cxflags("-fPIC", "-Wno-unknown-pragmas")
     end
