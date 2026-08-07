@@ -23,6 +23,12 @@ target("llaisys-utils")
 
     set_languages("cxx17")
     set_warnings("all", "error")
+    if is_plat("windows") then
+        add_cxflags("/openmp")
+    else
+        add_cxflags("-fopenmp")
+        add_ldflags("-fopenmp")
+    end
     if not is_plat("windows") then
         add_cxflags("-fPIC", "-Wno-unknown-pragmas")
     end
@@ -37,9 +43,18 @@ target("llaisys-device")
     set_kind("static")
     add_deps("llaisys-utils")
     add_deps("llaisys-device-cpu")
+    if has_config("nv-gpu") then
+        add_deps("llaisys-device-nvidia")
+    end
 
     set_languages("cxx17")
     set_warnings("all", "error")
+    if is_plat("windows") then
+        add_cxflags("/openmp")
+    else
+        add_cxflags("-fopenmp")
+        add_ldflags("-fopenmp")
+    end
     if not is_plat("windows") then
         add_cxflags("-fPIC", "-Wno-unknown-pragmas")
     end
@@ -56,6 +71,12 @@ target("llaisys-core")
 
     set_languages("cxx17")
     set_warnings("all", "error")
+    if is_plat("windows") then
+        add_cxflags("/openmp")
+    else
+        add_cxflags("-fopenmp")
+        add_ldflags("-fopenmp")
+    end
     if not is_plat("windows") then
         add_cxflags("-fPIC", "-Wno-unknown-pragmas")
     end
@@ -71,6 +92,12 @@ target("llaisys-tensor")
 
     set_languages("cxx17")
     set_warnings("all", "error")
+    if is_plat("windows") then
+        add_cxflags("/openmp")
+    else
+        add_cxflags("-fopenmp")
+        add_ldflags("-fopenmp")
+    end
     if not is_plat("windows") then
         add_cxflags("-fPIC", "-Wno-unknown-pragmas")
     end
@@ -83,9 +110,18 @@ target_end()
 target("llaisys-ops")
     set_kind("static")
     add_deps("llaisys-ops-cpu")
+    if has_config("nv-gpu") then
+        add_deps("llaisys-ops-nvidia")
+    end
 
     set_languages("cxx17")
     set_warnings("all", "error")
+    if is_plat("windows") then
+        add_cxflags("/openmp")
+    else
+        add_cxflags("-fopenmp")
+        add_ldflags("-fopenmp")
+    end
     if not is_plat("windows") then
         add_cxflags("-fPIC", "-Wno-unknown-pragmas")
     end
@@ -105,8 +141,36 @@ target("llaisys")
 
     set_languages("cxx17")
     set_warnings("all", "error")
+    if is_plat("windows") then
+        add_cxflags("/openmp")
+    else
+        add_cxflags("-fopenmp")
+        add_ldflags("-fopenmp")
+    end
     add_files("src/llaisys/*.cc")
+    add_files("src/models/*/*.cpp")
     set_installdir(".")
+
+    if has_config("nv-gpu") then
+        add_links("cudart")
+        if is_plat("windows") then
+            add_linkdirs("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.1/lib/x64")
+            add_includedirs("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.1/include")
+            -- force cudart for the fatbin registration symbols
+            add_ldflags("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.1/lib/x64/cudart.lib")
+        else
+            add_linkdirs("/usr/local/cuda/lib64")
+            add_includedirs("/usr/local/cuda/include")
+            add_ldflags("/usr/local/cuda/lib64/libcudart.so")
+        end
+    end
+
+    -- CUDA device-link step: nvcc -dlink generates the fatbin registration
+    -- object (__cudaRegisterLinkedBinary) which the plain MSVC linker needs.
+    -- The .obj is produced by on_load (see below) and linked statically.
+    if has_config("nv-gpu") and is_plat("windows") then
+        add_files("build/windows/x64/release/llaisys_dlink.obj")
+    end
 
     
     after_install(function (target)
